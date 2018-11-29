@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\user;
 
 class LoginController extends Controller
 {
@@ -25,7 +26,13 @@ class LoginController extends Controller
     	$this->validate($request, [
     		'email' => 'required|email',
     		'password' => 'required|min:6',
-    	]);
+		]);
+		$user_activated = User::where('email',$request->email)->get();
+
+      // 값이 false라면 안되도록...
+      if($user_activated[0]['activated'] == false){
+         return back()->with('message', '이메일 인증 부탁드립니다.');
+      };
     	if(!auth()->attempt($request->only('email', 'password'), $request->has('remember'))) {
  
     		return back()->withInput();
